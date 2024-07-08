@@ -61,10 +61,10 @@ locals {
   }
 
   ec2 = {
-    ec2_name               = module.naming.resources.ec2.name
+    ec2_name               = module.backend_naming.resources.ec2.name
     instance_type          = var.instance_type
-    subnet_id              = module.vpc.public_subnets[0]
-    vpc_security_group_ids = [aws_security_group.ec2.id]
+    subnet_id              = module.vpc.private_subnets[0]
+    vpc_security_group_ids = [aws_security_group.backend.id]
     iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
     iam_role_name          = aws_iam_role.ec2_iam_role.name
     ec2_ami                = var.ec2_ami
@@ -188,37 +188,37 @@ locals {
     height = 6
   }
 
-  cpu-alarm-backend = {
-    alarm_name          = "${local.app_name}-${var.environment}-cpu-alm"
-    comparison_operator = "GreaterThanOrEqualToThreshold"
-    evaluation_periods  = 1
-    metric_name         = "CPUUtilization"
-    namespace           = "AWS/EC2"
-    period              = 10
-    statistic           = "Average"
-    threshold           = 80
-    treat_missing_data  = "notBreaching"
-    alarm_description   = "CPU utilization monitoring alarms for back"
-    dimensions = {
-      AutoScalingGroupName = module.asg.autoscaling_group_name
-    }
-    alarm_actions = [module.sns.topic_arn, "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:opsitem:${local.severity.critical}#CATEGORY=${local.category.cost}", aws_autoscaling_policy.target_back.arn]
-  }
+  # cpu-alarm-backend = {
+  #   alarm_name          = "${local.app_name}-${var.environment}-cpu-alm"
+  #   comparison_operator = "GreaterThanOrEqualToThreshold"
+  #   evaluation_periods  = 1
+  #   metric_name         = "CPUUtilization"
+  #   namespace           = "AWS/EC2"
+  #   period              = 10
+  #   statistic           = "Average"
+  #   threshold           = 80
+  #   treat_missing_data  = "notBreaching"
+  #   alarm_description   = "CPU utilization monitoring alarms for back"
+  #   dimensions = {
+  #     AutoScalingGroupName = module.asg.autoscaling_group_name
+  #   }
+  #   alarm_actions = [module.sns.topic_arn, "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:opsitem:${local.severity.critical}#CATEGORY=${local.category.cost}", aws_autoscaling_policy.target_back.arn]
+  # }
 
-  status_check_alarm_back = {
-    alarm_name          = "${local.app_name}-${var.environment}-status-fail"
-    comparison_operator = "GreaterThanOrEqualToThreshold"
-    evaluation_periods  = "2"
-    metric_name         = "StatusCheckFailed_Instance"
-    namespace           = "AWS/EC2"
-    period              = "300" // 5 minutes
-    statistic           = "Sum"
-    threshold           = "1"
-    alarm_description   = "Alarm for status check"
-    treat_missing_data  = "notBreaching"
-    dimensions = {
-      AutoScalingGroupName = module.asg.autoscaling_group_name
-    }
-    alarm_actions = [module.sns.topic_arn]
-  }
+  # status_check_alarm_back = {
+  #   alarm_name          = "${local.app_name}-${var.environment}-status-fail"
+  #   comparison_operator = "GreaterThanOrEqualToThreshold"
+  #   evaluation_periods  = "2"
+  #   metric_name         = "StatusCheckFailed_Instance"
+  #   namespace           = "AWS/EC2"
+  #   period              = "300" // 5 minutes
+  #   statistic           = "Sum"
+  #   threshold           = "1"
+  #   alarm_description   = "Alarm for status check"
+  #   treat_missing_data  = "notBreaching"
+  #   dimensions = {
+  #     AutoScalingGroupName = module.asg.autoscaling_group_name
+  #   }
+  #   alarm_actions = [module.sns.topic_arn]
+  # }
 }

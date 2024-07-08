@@ -23,17 +23,13 @@ output "db_instance_arn" {
 
 output "db_instance_endpoint" {
   description = "The connection endpoint"
-  value       = module.rds.db_instance_endpoint
+  value       = substr(module.rds.db_instance_endpoint, 0, length(module.rds.db_instance_endpoint) - 5)
 }
 
 output "db_instance_id" {
   description = "The RDS instance ID"
-  value       = module.rds.db_instance_id
+  value       = module.rds.db_instance_identifier
 }
-# output "sensitive_value" {
-#   value = jsondecode(nonsensitive(data.aws_secretsmanager_secret_version.current.secret_string))
-# }
-
 
 output "db_instance_identifier" {
   description = "The RDS identifier"

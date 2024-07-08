@@ -54,7 +54,7 @@ module "ec2" {
 
 
 #   provisioner "local-exec" {
-#     command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook  -v ../ansible/install.yml -i ../ansible/aws_ec2.yml  --extra-vars ' migration_bucket=${data.aws_s3_bucket.asset_bucket.id} rds_endpoint=${module.rds.db_instance_endpoint} secrets_arn=${module.secrets_manager.secret_arn} region=${var.region} ' "
+#     command = "ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook  -v ansible/install.yml -i ansible/aws_ec2.yml  --extra-vars ' migration_bucket=${data.aws_s3_bucket.asset_bucket.id} rds_endpoint=${module.rds.db_instance_endpoint} region=${var.region} ' "
 #   }
-#   depends_on = [module.ec2, module.rds, module.secrets_manager]
+#   depends_on = [module.ec2, module.rds]
 # }

@@ -13,7 +13,7 @@ module "sns" {
         type        = "Service"
         identifiers = ["events.amazonaws.com"]
       }]
-      resources = [module.sns.topic_arn]
+      resources = [module.sns.aws_sns_topic_arn]
       effect    = "Allow"
       sid       = "TrustCWEToPublishEventsToMyTopic"
     },
@@ -23,7 +23,7 @@ module "sns" {
         type        = "Service"
         identifiers = ["cloudwatch.amazonaws.com"]
       }]
-      resources = [module.sns.topic_arn]
+      resources = [module.sns.aws_sns_topic_arn]
       effect    = "Allow"
       sid       = "TrustCloudWatchToPublishToMyTopic"
     }

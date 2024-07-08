@@ -8,13 +8,12 @@ Wbsite codebase for aseemit
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0 |
-| <a name="requirement_null"></a> [null](#requirement\_null) | 3.2.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.57.0 |
 
 ## Modules
 
@@ -25,18 +24,13 @@ Wbsite codebase for aseemit
 | <a name="module_backup"></a> [backup](#module\_backup) | ./modules/aws-backup | n/a |
 | <a name="module_codebase_bucket"></a> [codebase\_bucket](#module\_codebase\_bucket) | ./modules/s3 | n/a |
 | <a name="module_common_naming"></a> [common\_naming](#module\_common\_naming) | ./modules/naming | n/a |
-| <a name="module_cpu-alarm-backend-alarm"></a> [cpu-alarm-backend-alarm](#module\_cpu-alarm-backend-alarm) | ./modules/alarm | n/a |
-| <a name="module_dashboard"></a> [dashboard](#module\_dashboard) | ./modules/dashboard | n/a |
 | <a name="module_destination_vault"></a> [destination\_vault](#module\_destination\_vault) | ./modules/aws-backup | n/a |
 | <a name="module_ec2"></a> [ec2](#module\_ec2) | terraform-aws-modules/ec2-instance/aws | 5.6.1 |
 | <a name="module_frontend_naming"></a> [frontend\_naming](#module\_frontend\_naming) | ./modules/naming | n/a |
 | <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | ./modules/s3 | n/a |
-| <a name="module_log_widgets"></a> [log\_widgets](#module\_log\_widgets) | ./modules/dashboard/formater/logs | n/a |
-| <a name="module_metric_widgets"></a> [metric\_widgets](#module\_metric\_widgets) | ./modules/dashboard/formater/metrics | n/a |
 | <a name="module_rds"></a> [rds](#module\_rds) | ./modules/rds | n/a |
 | <a name="module_route53_hosted_zone"></a> [route53\_hosted\_zone](#module\_route53\_hosted\_zone) | ./modules/zones | n/a |
 | <a name="module_sns"></a> [sns](#module\_sns) | ./modules/sns | n/a |
-| <a name="module_status-check-alarm-back"></a> [status-check-alarm-back](#module\_status-check-alarm-back) | ./modules/alarm | n/a |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | ./modules/vpc | n/a |
 
 ## Resources
@@ -61,8 +55,6 @@ Wbsite codebase for aseemit
 | [aws_ebs_volume.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ebs_volume) | data source |
 | [aws_ebs_volumes.volumes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ebs_volumes) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
-| [aws_s3_bucket.asset_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/s3_bucket) | data source |
-| [aws_secretsmanager_secret.secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret) | data source |
 
 ## Inputs
 

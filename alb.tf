@@ -20,6 +20,14 @@ module "alb" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
+      description = "SSH web traffic"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+    ingress_all_http = {
+      type        = "ingress"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
       description = "HTTP web traffic"
       cidr_blocks = ["0.0.0.0/0"]
     }

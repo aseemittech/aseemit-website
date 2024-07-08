@@ -36,6 +36,13 @@ resource "aws_security_group" "backend" {
   }
 
   ingress {
+    description     = "SSH ingress"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [module.alb.security_group_id]
+  }
+  ingress {
     description     = "HTTP ingress"
     from_port       = 80
     to_port         = 80
