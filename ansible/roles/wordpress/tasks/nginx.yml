@@ -1,0 +1,57 @@
+---
+- name: Wordpress | Nginx | Figure out PHP FPM socket location
+  shell: dpkg -l | grep php-fpm  | awk '{print $3}' | grep -o '[0-9]\.[0-9]' | head -n 1
+  register: 'php_ver'
+
+- name: Start service php{{ php_ver.stdout }}
+  service:
+    name: "php{{ php_ver.stdout }}-fpm"
+    state: started
+
+- name: Start service nginx
+  service:
+    name: "nginx"
+    state: started
+
+- name: Wordpress | Nginx | Copy virtual host configuration file
+  template:
+    src: "nginx-vhost.j2"
+    dest: "/etc/nginx/sites-available/{{ wp_sitename }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: WordPress | Nginx | Symlink virtual host configuration file from sites-available to sites-enabled
+  file:
+    state: link
+    src: "/etc/nginx/sites-available/{{ wp_sitename }}"
+    dest: "/etc/nginx/sites-enabled/{{ wp_sitename }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Certbot and Certbot Nginx plugin
+  become: true
+  apt:
+    name: python3-certbot-nginx
+    state: present
+
+- name: Check for the ssl certificate existance
+  stat:
+    path: /etc/letsencrypt/live/{{ wp_sitename }}/fullchain.pem
+  register: certificate_check
+
+- name: Obtain SSL certificates
+  command: certbot --nginx --webroot-path=/var/www/{{ wp_sitename }} -d {{ wp_sitename }}  --non-interactive --agree-tos --email {{ wp_admin_email }}
+  notify: restart nginx
+  when: certificate_check.stat.exists == False    
+
+- name: Create cron jobs for Certbot renewal
+  cron:
+    name: "Renew Let's Encrypt certificates"
+    minute: "0"
+    hour: "0"
+    day: "1"
+    month: "*"
+    weekday: "*"
+    job: "certbot renew"

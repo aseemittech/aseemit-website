@@ -1,0 +1,19 @@
+---
+- hosts: all
+  remote_user: ssm-user
+  become: true
+  gather_facts: true
+  vars:
+    wp_webserver: nginx
+    wp_sitename: kjarchitectsllc.com
+    wp_admin_email: "admin@kjarchitectsllc.com"
+    wp_db_host: "{{ rds_endpoint }}"
+    wp_mysql_db: "kjarchit_kja"
+    wp_install_dir: "/var/www/{{ wp_sitename }}"
+    ansible_connection: community.aws.aws_ssm
+    ansible_aws_ssm_region: "us-east-1"
+    ansible_aws_ssm_timeout: 5000
+    ansible_aws_ssm_retries: 10
+    ansible_aws_ssm_bucket_name: "{{ migration_bucket }}"
+  roles:
+    - wordpress
