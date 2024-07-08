@@ -64,3 +64,7 @@ subscriptions = {
 rule_schedule          = "cron(0 * * * ? *)"
 rule_start_window      = "60"
 rule_completion_window = "120"
+
+# Variable for Secrets managers
+enable_rotation         = false
+recovery_window_in_days = 0

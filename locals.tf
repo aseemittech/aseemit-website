@@ -191,6 +191,14 @@ locals {
     height = 6
   }
 
+  secrets = {
+    name_prefix             = "${module.naming.resources.prefix.name}-secret1"
+    description             = "Secrets Manager secret for RDS database"
+    ignore_secret_changes   = true
+    enable_rotation         = var.enable_rotation
+    recovery_window_in_days = var.recovery_window_in_days
+  }
+
   # cpu-alarm-backend = {
   #   alarm_name          = "${local.app_name}-${var.environment}-cpu-alm"
   #   comparison_operator = "GreaterThanOrEqualToThreshold"
