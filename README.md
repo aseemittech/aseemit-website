@@ -14,6 +14,7 @@ Wbsite codebase for aseemit
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 5.57.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.6.2 |
 
 ## Modules
 
@@ -30,6 +31,7 @@ Wbsite codebase for aseemit
 | <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | ./modules/s3 | n/a |
 | <a name="module_rds"></a> [rds](#module\_rds) | ./modules/rds | n/a |
 | <a name="module_route53_hosted_zone"></a> [route53\_hosted\_zone](#module\_route53\_hosted\_zone) | ./modules/zones | n/a |
+| <a name="module_secrets_manager"></a> [secrets\_manager](#module\_secrets\_manager) | ./modules/secrets | n/a |
 | <a name="module_sns"></a> [sns](#module\_sns) | ./modules/sns | n/a |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | ./modules/vpc | n/a |
 
@@ -50,6 +52,7 @@ Wbsite codebase for aseemit
 | [aws_security_group.backend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.database](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [random_string.rand4](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_ebs_volume.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ebs_volume) | data source |
@@ -64,8 +67,12 @@ Wbsite codebase for aseemit
 | <a name="input_associate_public_ip_address"></a> [associate\_public\_ip\_address](#input\_associate\_public\_ip\_address) | public ip allocation | `bool` | n/a | yes |
 | <a name="input_backend_port"></a> [backend\_port](#input\_backend\_port) | value of the backend port | `number` | n/a | yes |
 | <a name="input_backend_protocol"></a> [backend\_protocol](#input\_backend\_protocol) | value of the backend protocol | `string` | n/a | yes |
+| <a name="input_backup_retention_period"></a> [backup\_retention\_period](#input\_backup\_retention\_period) | The days to retain backups for | `number` | `0` | no |
 | <a name="input_create_iam_instance_profile"></a> [create\_iam\_instance\_profile](#input\_create\_iam\_instance\_profile) | instance profile creation | `bool` | n/a | yes |
+| <a name="input_create_monitoring_role"></a> [create\_monitoring\_role](#input\_create\_monitoring\_role) | Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs | `bool` | `false` | no |
+| <a name="input_create_random_password"></a> [create\_random\_password](#input\_create\_random\_password) | Whether to create random password for RDS primary cluster | `bool` | `true` | no |
 | <a name="input_db_name"></a> [db\_name](#input\_db\_name) | The database name | `string` | n/a | yes |
+| <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | The database can't be deleted when this value is set to true | `bool` | `false` | no |
 | <a name="input_disable_api_stop"></a> [disable\_api\_stop](#input\_disable\_api\_stop) | status of the api stop | `bool` | n/a | yes |
 | <a name="input_ec2_ami"></a> [ec2\_ami](#input\_ec2\_ami) | Type of the ami that is being used | `string` | n/a | yes |
 | <a name="input_enable_rotation"></a> [enable\_rotation](#input\_enable\_rotation) | Determines whether secret rotation is enabled | `bool` | `true` | no |
@@ -77,6 +84,8 @@ Wbsite codebase for aseemit
 | <a name="input_internal"></a> [internal](#input\_internal) | Determines whether the ALB is internal or internet facing | `bool` | n/a | yes |
 | <a name="input_major_engine_version"></a> [major\_engine\_version](#input\_major\_engine\_version) | Specifies the major version of the engine that this option group should be associated with | `string` | `null` | no |
 | <a name="input_monitoring"></a> [monitoring](#input\_monitoring) | monitoring configuration | `bool` | n/a | yes |
+| <a name="input_monitoring_interval"></a> [monitoring\_interval](#input\_monitoring\_interval) | The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60 | `number` | `5` | no |
+| <a name="input_multi_az"></a> [multi\_az](#input\_multi\_az) | Specifies if the RDS instance is multi-AZ | `bool` | `true` | no |
 | <a name="input_number_of_azs"></a> [number\_of\_azs](#input\_number\_of\_azs) | number of availability zones | `number` | `3` | no |
 | <a name="input_recovery_window_in_days"></a> [recovery\_window\_in\_days](#input\_recovery\_window\_in\_days) | Number of days that AWS Secrets Manager waits before it can delete the secret. This value can be `0` to force deletion without recovery or range from `7` to `30` days. The default value is `30` | `number` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS region | `string` | `"us-east-1"` | no |

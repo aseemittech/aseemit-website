@@ -22,7 +22,7 @@ variable "use_identifier_prefix" {
 
 variable "allocated_storage" {
   description = "The allocated storage in gigabytes"
-  type        = number
+  type        = string
   default     = null
 }
 
@@ -71,7 +71,7 @@ variable "replica_mode" {
 variable "iam_database_authentication_enabled" {
   description = "Specifies whether or mappings of AWS Identity and Access Management (IAM) accounts to database accounts is enabled"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "domain" {
@@ -80,32 +80,8 @@ variable "domain" {
   default     = null
 }
 
-variable "domain_auth_secret_arn" {
-  description = "(Optional, but required if domain_fqdn is provided) The ARN for the Secrets Manager secret with the self managed Active Directory credentials for the user joining the domain. Conflicts with domain and domain_iam_role_name."
-  type        = string
-  default     = null
-}
-
-variable "domain_dns_ips" {
-  description = "(Optional, but required if domain_fqdn is provided) The IPv4 DNS IP addresses of your primary and secondary self managed Active Directory domain controllers. Two IP addresses must be provided. If there isn't a secondary domain controller, use the IP address of the primary domain controller for both entries in the list. Conflicts with domain and domain_iam_role_name."
-  type        = list(string)
-  default     = null
-}
-
-variable "domain_fqdn" {
-  description = "The fully qualified domain name (FQDN) of the self managed Active Directory domain. Conflicts with domain and domain_iam_role_name."
-  type        = string
-  default     = null
-}
-
 variable "domain_iam_role_name" {
   description = "(Required if domain is provided) The name of the IAM role to be used when making API calls to the Directory Service"
-  type        = string
-  default     = null
-}
-
-variable "domain_ou" {
-  description = "(Optional, but required if domain_fqdn is provided) The self managed Active Directory organizational unit for your DB instance to join. Conflicts with domain and domain_iam_role_name."
   type        = string
   default     = null
 }
@@ -146,21 +122,6 @@ variable "password" {
   default     = null
 }
 
-variable "manage_master_user_password" {
-  description = "Set to true to allow RDS to manage the master user password in Secrets Manager. Cannot be set if password is provided"
-  type        = bool
-  default     = true
-}
-
-variable "master_user_secret_kms_key_id" {
-  description = <<EOF
-  The key ARN, key ID, alias ARN or alias name for the KMS key to encrypt the master user password secret in Secrets Manager.
-  If not specified, the default KMS key for your Amazon Web Services account is used.
-  EOF
-  type        = string
-  default     = null
-}
-
 variable "port" {
   description = "The port on which the DB accepts connections"
   type        = string
@@ -182,7 +143,7 @@ variable "snapshot_identifier" {
 variable "copy_tags_to_snapshot" {
   description = "On delete, copy all Instance tags to the final snapshot"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "final_snapshot_identifier_prefix" {
@@ -218,7 +179,7 @@ variable "availability_zone" {
 variable "multi_az" {
   description = "Specifies if the RDS instance is multi-AZ"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "iops" {
@@ -236,7 +197,7 @@ variable "publicly_accessible" {
 variable "monitoring_interval" {
   description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60."
   type        = number
-  default     = 0
+  default     = 5
 }
 
 variable "monitoring_role_arn" {
@@ -308,7 +269,7 @@ variable "blue_green_update" {
 variable "backup_retention_period" {
   description = "The days to retain backups for"
   type        = number
-  default     = null
+  default     = 30
 }
 
 variable "backup_window" {
@@ -319,12 +280,6 @@ variable "backup_window" {
 
 variable "tags" {
   description = "A mapping of tags to assign to all resources"
-  type        = map(string)
-  default     = {}
-}
-
-variable "db_instance_tags" {
-  description = "A map of additional tags for the DB instance"
   type        = map(string)
   default     = {}
 }
@@ -356,7 +311,7 @@ variable "nchar_character_set_name" {
 variable "enabled_cloudwatch_logs_exports" {
   description = "List of log types to enable for exporting to CloudWatch logs. If omitted, no logs will be exported. Valid values (depending on engine): alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL)."
   type        = list(string)
-  default     = []
+  default     = ["general", "error", "slowquery"]
 }
 
 variable "timeouts" {
@@ -368,13 +323,13 @@ variable "timeouts" {
 variable "deletion_protection" {
   description = "The database can't be deleted when this value is set to true."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "performance_insights_enabled" {
   description = "Specifies whether Performance Insights are enabled"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "performance_insights_retention_period" {
@@ -426,12 +381,6 @@ variable "network_type" {
   default     = null
 }
 
-variable "dedicated_log_volume" {
-  description = "Use a dedicated log volume (DLV) for the DB instance. Requires Provisioned IOPS."
-  type        = bool
-  default     = false
-}
-
 ################################################################################
 # CloudWatch Log Group
 ################################################################################
@@ -439,63 +388,17 @@ variable "dedicated_log_volume" {
 variable "create_cloudwatch_log_group" {
   description = "Determines whether a CloudWatch log group is created for each `enabled_cloudwatch_logs_exports`"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "cloudwatch_log_group_retention_in_days" {
   description = "The number of days to retain CloudWatch logs for the DB instance"
   type        = number
-  default     = 7
+  default     = 365
 }
 
 variable "cloudwatch_log_group_kms_key_id" {
   description = "The ARN of the KMS Key to use when encrypting log data"
-  type        = string
-  default     = null
-}
-
-variable "cloudwatch_log_group_skip_destroy" {
-  description = "Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state"
-  type        = bool
-  default     = null
-}
-
-variable "cloudwatch_log_group_class" {
-  description = "Specified the log class of the log group. Possible values are: STANDARD or INFREQUENT_ACCESS"
-  type        = string
-  default     = null
-}
-
-################################################################################
-# Managed Secret Rotation
-################################################################################
-
-variable "manage_master_user_password_rotation" {
-  description = "Whether to manage the master user password rotation. By default, false on creation, rotation is managed by RDS. Setting this value to false after previously having been set to true will disable automatic rotation."
-  type        = bool
-  default     = false
-}
-
-variable "master_user_password_rotate_immediately" {
-  description = "Specifies whether to rotate the secret immediately or wait until the next scheduled rotation window."
-  type        = bool
-  default     = null
-}
-
-variable "master_user_password_rotation_automatically_after_days" {
-  description = "Specifies the number of days between automatic scheduled rotations of the secret. Either automatically_after_days or schedule_expression must be specified."
-  type        = number
-  default     = null
-}
-
-variable "master_user_password_rotation_duration" {
-  description = "The length of the rotation window in hours. For example, 3h for a three hour window."
-  type        = string
-  default     = null
-}
-
-variable "master_user_password_rotation_schedule_expression" {
-  description = "A cron() or rate() expression that defines the schedule for rotating your secret. Either automatically_after_days or schedule_expression must be specified."
   type        = string
   default     = null
 }

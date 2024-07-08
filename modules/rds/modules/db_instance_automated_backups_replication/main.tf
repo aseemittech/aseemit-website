@@ -1,3 +1,6 @@
+################################################################################
+# DB instance automated backup resource creation
+################################################################################
 resource "aws_db_instance_automated_backups_replication" "this" {
   count = var.create ? 1 : 0
 

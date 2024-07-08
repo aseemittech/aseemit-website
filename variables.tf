@@ -152,6 +152,42 @@ variable "username" {
   default     = null
 }
 
+variable "multi_az" {
+  description = "Specifies if the RDS instance is multi-AZ"
+  type        = bool
+  default     = true
+}
+
+variable "deletion_protection" {
+  description = "The database can't be deleted when this value is set to true"
+  type        = bool
+  default     = false
+}
+
+variable "create_random_password" {
+  description = "Whether to create random password for RDS primary cluster"
+  type        = bool
+  default     = true
+}
+
+variable "backup_retention_period" {
+  description = "The days to retain backups for"
+  type        = number
+  default     = 0
+}
+
+variable "monitoring_interval" {
+  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60"
+  type        = number
+  default     = 5
+}
+
+variable "create_monitoring_role" {
+  description = "Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs"
+  type        = bool
+  default     = false
+}
+
 variable "major_engine_version" {
   description = "Specifies the major version of the engine that this option group should be associated with"
   type        = string

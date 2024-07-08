@@ -1,13 +1,7 @@
-output "enhanced_monitoring_iam_role_name" {
-  description = "The name of the monitoring role"
-  value       = module.db_instance.enhanced_monitoring_iam_role_name
-}
 
-output "enhanced_monitoring_iam_role_arn" {
-  description = "The Amazon Resource Name (ARN) specifying the monitoring role"
-  value       = module.db_instance.enhanced_monitoring_iam_role_arn
-}
-
+################################################################################
+# DB instance output
+################################################################################
 output "db_instance_address" {
   description = "The address of the RDS instance"
   value       = module.db_instance.db_instance_address
@@ -48,9 +42,9 @@ output "db_instance_hosted_zone_id" {
   value       = module.db_instance.db_instance_hosted_zone_id
 }
 
-output "db_instance_identifier" {
-  description = "The RDS instance identifier"
-  value       = module.db_instance.db_instance_identifier
+output "db_instance_id" {
+  description = "The RDS instance ID"
+  value       = module.db_instance.db_instance_id
 }
 
 output "db_instance_resource_id" {
@@ -68,9 +62,20 @@ output "db_instance_name" {
   value       = module.db_instance.db_instance_name
 }
 
+output "db_instance_identifier" {
+  description = "The RDS identifier"
+  value       = module.db_instance.db_instance_identifier
+}
+
 output "db_instance_username" {
   description = "The master username for the database"
   value       = module.db_instance.db_instance_username
+  sensitive   = true
+}
+
+output "db_instance_password" {
+  description = "The database password (this password may be old, because Terraform doesn't track it after initial creation)"
+  value       = local.password
   sensitive   = true
 }
 
@@ -79,29 +84,9 @@ output "db_instance_domain" {
   value       = module.db_instance.db_instance_domain
 }
 
-output "db_instance_domain_auth_secret_arn" {
-  description = "The ARN for the Secrets Manager secret with the self managed Active Directory credentials for the user joining the domain"
-  value       = module.db_instance.db_instance_domain_auth_secret_arn
-}
-
-output "db_instance_domain_dns_ips" {
-  description = "The IPv4 DNS IP addresses of your primary and secondary self managed Active Directory domain controllers"
-  value       = module.db_instance.db_instance_domain_dns_ips
-}
-
-output "db_instance_domain_fqdn" {
-  description = "The fully qualified domain name (FQDN) of an self managed Active Directory domain"
-  value       = module.db_instance.db_instance_domain_fqdn
-}
-
 output "db_instance_domain_iam_role_name" {
-  description = "The name of the IAM role to be used when making API calls to the Directory Service"
+  description = "The name of the IAM role to be used when making API calls to the Directory Service. "
   value       = module.db_instance.db_instance_domain_iam_role_name
-}
-
-output "db_instance_domain_ou" {
-  description = "The self managed Active Directory organizational unit for your DB instance to join"
-  value       = module.db_instance.db_instance_domain_ou
 }
 
 output "db_instance_port" {
@@ -114,11 +99,9 @@ output "db_instance_ca_cert_identifier" {
   value       = module.db_instance.db_instance_ca_cert_identifier
 }
 
-output "db_instance_master_user_secret_arn" {
-  description = "The ARN of the master user secret (Only available when manage_master_user_password is set to true)"
-  value       = module.db_instance.db_instance_master_user_secret_arn
-}
-
+################################################################################
+# DB subnet group output
+################################################################################
 output "db_subnet_group_id" {
   description = "The db subnet group name"
   value       = module.db_subnet_group.db_subnet_group_id
@@ -139,7 +122,9 @@ output "db_parameter_group_arn" {
   value       = module.db_parameter_group.db_parameter_group_arn
 }
 
-# DB option group
+################################################################################
+# DB option group output
+################################################################################
 output "db_option_group_id" {
   description = "The db option group id"
   value       = module.db_option_group.db_option_group_id
@@ -149,30 +134,23 @@ output "db_option_group_arn" {
   description = "The ARN of the db option group"
   value       = module.db_option_group.db_option_group_arn
 }
-
 ################################################################################
-# CloudWatch Log Group
+# Enhanced monitoring output
+################################################################################
+output "enhanced_monitoring_iam_role_name" {
+  description = "The name of the monitoring role"
+  value       = module.db_instance.enhanced_monitoring_iam_role_name
+}
+
+output "enhanced_monitoring_iam_role_arn" {
+  description = "The Amazon Resource Name (ARN) specifying the monitoring role"
+  value       = module.db_instance.enhanced_monitoring_iam_role_arn
+}
+################################################################################
+# CloudWatch Log Group output
 ################################################################################
 
 output "db_instance_cloudwatch_log_groups" {
   description = "Map of CloudWatch log groups created and their attributes"
   value       = module.db_instance.db_instance_cloudwatch_log_groups
-}
-
-################################################################################
-# DB Instance Role Association
-################################################################################
-
-output "db_instance_role_associations" {
-  description = "A map of DB Instance Identifiers and IAM Role ARNs separated by a comma"
-  value       = module.db_instance_role_association
-}
-
-################################################################################
-# Managed Secret Rotation
-################################################################################
-
-output "db_instance_secretsmanager_secret_rotation_enabled" {
-  description = "Specifies whether automatic rotation is enabled for the secret"
-  value       = module.db_instance.db_instance_secretsmanager_secret_rotation_enabled
 }

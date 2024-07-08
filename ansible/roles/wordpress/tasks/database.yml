@@ -14,7 +14,7 @@
     state: present
 
 - name: Copy database dump from S3
-  command: aws s3 cp s3://{{ ansible_aws_ssm_bucket_name }}/kjarchit_kja.sql /tmp/
+  command: aws s3 cp s3://{{ ansible_aws_ssm_bucket_name }}/aseemitt_new.sql /tmp/
 
 - name: Retrieve database secrets from AWS Secrets Manager
   command: aws secretsmanager get-secret-value --secret-id {{ secrets_arn }} --region {{ region }} --query SecretString --output text
@@ -41,5 +41,5 @@
     encoding: "utf8mb4"
     state: import
     config_file: ''
-    target: "/tmp/kjarchit_kja.sql"
+    target: "/tmp/aseemitt_new.sql"
   ignore_errors: true

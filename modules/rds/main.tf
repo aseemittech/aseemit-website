@@ -1,18 +1,5 @@
-locals {
-  create_db_subnet_group    = var.create_db_subnet_group && var.putin_khuylo
-  create_db_parameter_group = var.create_db_parameter_group && var.putin_khuylo
-  create_db_instance        = var.create_db_instance && var.putin_khuylo
-
-  db_subnet_group_name    = var.create_db_subnet_group ? module.db_subnet_group.db_subnet_group_id : var.db_subnet_group_name
-  parameter_group_name_id = var.create_db_parameter_group ? module.db_parameter_group.db_parameter_group_id : var.parameter_group_name
-
-  create_db_option_group = var.create_db_option_group && var.engine != "postgres"
-  option_group           = local.create_db_option_group ? module.db_option_group.db_option_group_id : var.option_group_name
-}
-
 module "db_subnet_group" {
   source = "./modules/db_subnet_group"
-
   create = local.create_db_subnet_group
 
   name            = coalesce(var.db_subnet_group_name, var.identifier)
@@ -25,22 +12,19 @@ module "db_subnet_group" {
 
 module "db_parameter_group" {
   source = "./modules/db_parameter_group"
-
   create = local.create_db_parameter_group
 
   name            = coalesce(var.parameter_group_name, var.identifier)
   use_name_prefix = var.parameter_group_use_name_prefix
   description     = var.parameter_group_description
   family          = var.family
-
-  parameters = var.parameters
+  parameters      = var.parameters
 
   tags = merge(var.tags, var.db_parameter_group_tags)
 }
 
 module "db_option_group" {
   source = "./modules/db_option_group"
-
   create = local.create_db_option_group
 
   name                     = coalesce(var.option_group_name, var.identifier)
@@ -48,50 +32,35 @@ module "db_option_group" {
   option_group_description = var.option_group_description
   engine_name              = var.engine
   major_engine_version     = var.major_engine_version
-
-  options = var.options
-
-  timeouts = var.option_group_timeouts
+  options                  = var.options
+  timeouts                 = var.option_group_timeouts
 
   tags = merge(var.tags, var.db_option_group_tags)
 }
 
 module "db_instance" {
   source = "./modules/db_instance"
+  create = local.create_db_instance
 
-  create                = local.create_db_instance
   identifier            = var.identifier
   use_identifier_prefix = var.instance_use_identifier_prefix
-
-  engine            = var.engine
-  engine_version    = var.engine_version
-  instance_class    = var.instance_class
-  allocated_storage = var.allocated_storage
-  storage_type      = var.storage_type
-  storage_encrypted = var.storage_encrypted
-  kms_key_id        = var.kms_key_id
-  license_model     = var.license_model
+  engine                = var.engine
+  engine_version        = var.engine_version
+  instance_class        = var.instance_class
+  allocated_storage     = var.allocated_storage
+  storage_type          = var.storage_type
+  storage_encrypted     = var.storage_encrypted
+  kms_key_id            = var.kms_key_id
+  license_model         = var.license_model
 
   db_name                             = var.db_name
   username                            = var.username
-  password                            = var.manage_master_user_password ? null : var.password
+  password                            = local.password
   port                                = var.port
   domain                              = var.domain
-  domain_auth_secret_arn              = var.domain_auth_secret_arn
-  domain_dns_ips                      = var.domain_dns_ips
-  domain_fqdn                         = var.domain_fqdn
   domain_iam_role_name                = var.domain_iam_role_name
-  domain_ou                           = var.domain_ou
   iam_database_authentication_enabled = var.iam_database_authentication_enabled
   custom_iam_instance_profile         = var.custom_iam_instance_profile
-  manage_master_user_password         = var.manage_master_user_password
-  master_user_secret_kms_key_id       = var.master_user_secret_kms_key_id
-
-  manage_master_user_password_rotation                   = var.manage_master_user_password_rotation
-  master_user_password_rotate_immediately                = var.master_user_password_rotate_immediately
-  master_user_password_rotation_automatically_after_days = var.master_user_password_rotation_automatically_after_days
-  master_user_password_rotation_duration                 = var.master_user_password_rotation_duration
-  master_user_password_rotation_schedule_expression      = var.master_user_password_rotation_schedule_expression
 
   vpc_security_group_ids = var.vpc_security_group_ids
   db_subnet_group_name   = local.db_subnet_group_name
@@ -99,13 +68,12 @@ module "db_instance" {
   option_group_name      = var.engine != "postgres" ? local.option_group : null
   network_type           = var.network_type
 
-  availability_zone    = var.availability_zone
-  multi_az             = var.multi_az
-  iops                 = var.iops
-  storage_throughput   = var.storage_throughput
-  publicly_accessible  = var.publicly_accessible
-  ca_cert_identifier   = var.ca_cert_identifier
-  dedicated_log_volume = var.dedicated_log_volume
+  availability_zone   = var.availability_zone
+  multi_az            = var.multi_az
+  iops                = var.iops
+  storage_throughput  = var.storage_throughput
+  publicly_accessible = var.publicly_accessible
+  ca_cert_identifier  = var.ca_cert_identifier
 
   allow_major_version_upgrade = var.allow_major_version_upgrade
   auto_minor_version_upgrade  = var.auto_minor_version_upgrade
@@ -143,27 +111,12 @@ module "db_instance" {
   create_cloudwatch_log_group            = var.create_cloudwatch_log_group
   cloudwatch_log_group_retention_in_days = var.cloudwatch_log_group_retention_in_days
   cloudwatch_log_group_kms_key_id        = var.cloudwatch_log_group_kms_key_id
-  cloudwatch_log_group_skip_destroy      = var.cloudwatch_log_group_skip_destroy
-  cloudwatch_log_group_class             = var.cloudwatch_log_group_class
 
-  timeouts = var.timeouts
-
+  timeouts                 = var.timeouts
   deletion_protection      = var.deletion_protection
   delete_automated_backups = var.delete_automated_backups
-
   restore_to_point_in_time = var.restore_to_point_in_time
   s3_import                = var.s3_import
 
-  db_instance_tags = var.db_instance_tags
-  tags             = var.tags
-}
-
-module "db_instance_role_association" {
-  source = "./modules/db_instance_role_association"
-
-  for_each = { for k, v in var.db_instance_role_associations : k => v if var.create_db_instance }
-
-  feature_name           = each.key
-  role_arn               = each.value
-  db_instance_identifier = module.db_instance.db_instance_identifier
+  tags = merge(var.tags, var.db_instance_tags)
 }

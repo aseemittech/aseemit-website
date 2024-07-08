@@ -19,11 +19,17 @@ target_type        = "instance"
 enabled = true
 
 ## Variable for RDS
-db_name              = "aseemit"
-instance_class       = "db.t3.micro"
-username             = "aseem"
-major_engine_version = "8.0"
-allocated_storage    = 150
+db_name                 = "aseemit"
+instance_class          = "db.t3.micro"
+username                = "aseem"
+monitoring_interval     = "10"
+major_engine_version    = "8.0"
+allocated_storage       = 100
+backup_retention_period = 1
+multi_az                = false
+deletion_protection     = true
+create_random_password  = true
+create_monitoring_role  = true
 
 ## variables for ec2
 ec2_ami       = "ami-0c2af51e265bd5e0e"

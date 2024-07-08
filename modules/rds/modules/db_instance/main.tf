@@ -1,30 +1,16 @@
-locals {
-  monitoring_role_arn = var.create_monitoring_role ? aws_iam_role.enhanced_monitoring[0].arn : var.monitoring_role_arn
 
-  final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.final_snapshot_identifier_prefix}-${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"
-
-  identifier        = var.use_identifier_prefix ? null : var.identifier
-  identifier_prefix = var.use_identifier_prefix ? "${var.identifier}-" : null
-
-  monitoring_role_name        = var.monitoring_role_use_name_prefix ? null : var.monitoring_role_name
-  monitoring_role_name_prefix = var.monitoring_role_use_name_prefix ? "${var.monitoring_role_name}-" : null
-
-  # Replicas will use source metadata
-  is_replica = var.replicate_source_db != null
-}
-
-# Ref. https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
 data "aws_partition" "current" {}
 
 resource "random_id" "snapshot_identifier" {
   count = var.create && !var.skip_final_snapshot ? 1 : 0
-
   keepers = {
     id = var.identifier
   }
-
   byte_length = 4
 }
+################################################################################
+# DB instance resource creation
+################################################################################
 
 resource "aws_db_instance" "this" {
   count = var.create ? 1 : 0
@@ -32,7 +18,7 @@ resource "aws_db_instance" "this" {
   identifier        = local.identifier
   identifier_prefix = local.identifier_prefix
 
-  engine            = local.is_replica ? null : var.engine
+  engine            = local.engine
   engine_version    = var.engine_version
   instance_class    = var.instance_class
   allocated_storage = var.allocated_storage
@@ -42,19 +28,13 @@ resource "aws_db_instance" "this" {
   license_model     = var.license_model
 
   db_name                             = var.db_name
-  username                            = !local.is_replica ? var.username : null
-  password                            = !local.is_replica && var.manage_master_user_password ? null : var.password
+  username                            = local.username
+  password                            = local.password
   port                                = var.port
   domain                              = var.domain
-  domain_auth_secret_arn              = var.domain_auth_secret_arn
-  domain_dns_ips                      = var.domain_dns_ips
-  domain_fqdn                         = var.domain_fqdn
   domain_iam_role_name                = var.domain_iam_role_name
-  domain_ou                           = var.domain_ou
   iam_database_authentication_enabled = var.iam_database_authentication_enabled
   custom_iam_instance_profile         = var.custom_iam_instance_profile
-  manage_master_user_password         = !local.is_replica && var.manage_master_user_password ? var.manage_master_user_password : null
-  master_user_secret_kms_key_id       = !local.is_replica && var.manage_master_user_password ? var.master_user_secret_kms_key_id : null
 
   vpc_security_group_ids = var.vpc_security_group_ids
   db_subnet_group_name   = var.db_subnet_group_name
@@ -62,20 +42,19 @@ resource "aws_db_instance" "this" {
   option_group_name      = var.option_group_name
   network_type           = var.network_type
 
-  availability_zone    = var.availability_zone
-  multi_az             = var.multi_az
-  iops                 = var.iops
-  storage_throughput   = var.storage_throughput
-  publicly_accessible  = var.publicly_accessible
-  ca_cert_identifier   = var.ca_cert_identifier
-  dedicated_log_volume = var.dedicated_log_volume
+  availability_zone   = var.availability_zone
+  multi_az            = var.multi_az
+  iops                = var.iops
+  storage_throughput  = var.storage_throughput
+  publicly_accessible = var.publicly_accessible
+  ca_cert_identifier  = var.ca_cert_identifier
 
   allow_major_version_upgrade = var.allow_major_version_upgrade
   auto_minor_version_upgrade  = var.auto_minor_version_upgrade
   apply_immediately           = var.apply_immediately
   maintenance_window          = var.maintenance_window
 
-  # https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/blue-green-deployments.html
+
   dynamic "blue_green_update" {
     for_each = length(var.blue_green_update) > 0 ? [var.blue_green_update] : []
 
@@ -133,7 +112,7 @@ resource "aws_db_instance" "this" {
     }
   }
 
-  tags = merge(var.tags, var.db_instance_tags)
+  tags = var.tags
 
   depends_on = [aws_cloudwatch_log_group.this]
 
@@ -142,9 +121,6 @@ resource "aws_db_instance" "this" {
     delete = lookup(var.timeouts, "delete", null)
     update = lookup(var.timeouts, "update", null)
   }
-
-  # Note: do not add `latest_restorable_time` to `ignore_changes`
-  # https://github.com/terraform-aws-modules/terraform-aws-rds/issues/478
 }
 
 ################################################################################
@@ -158,8 +134,6 @@ resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/rds/instance/${var.identifier}/${each.value}"
   retention_in_days = var.cloudwatch_log_group_retention_in_days
   kms_key_id        = var.cloudwatch_log_group_kms_key_id
-  skip_destroy      = var.cloudwatch_log_group_skip_destroy
-  log_group_class   = var.cloudwatch_log_group_class
 
   tags = var.tags
 }
@@ -203,21 +177,4 @@ resource "aws_iam_role_policy_attachment" "enhanced_monitoring" {
 
   role       = aws_iam_role.enhanced_monitoring[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
-}
-
-################################################################################
-# Managed Secret Rotation
-################################################################################
-
-resource "aws_secretsmanager_secret_rotation" "this" {
-  count = var.create && var.manage_master_user_password && var.manage_master_user_password_rotation ? 1 : 0
-
-  secret_id          = aws_db_instance.this[0].master_user_secret[0].secret_arn
-  rotate_immediately = var.master_user_password_rotate_immediately
-
-  rotation_rules {
-    automatically_after_days = var.master_user_password_rotation_automatically_after_days
-    duration                 = var.master_user_password_rotation_duration
-    schedule_expression      = var.master_user_password_rotation_schedule_expression
-  }
 }
