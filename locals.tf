@@ -192,7 +192,7 @@ locals {
   }
 
   secrets = {
-    name_prefix             = "${module.naming.resources.prefix.name}-secret1"
+    name_prefix             = "${module.common_naming.resources.prefix.name}-secret1"
     description             = "Secrets Manager secret for RDS database"
     ignore_secret_changes   = true
     enable_rotation         = var.enable_rotation
