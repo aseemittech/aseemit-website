@@ -39,22 +39,22 @@ module "ec2" {
 ################################################################################
 # aws eip
 ################################################################################
-resource "aws_eip" "ec2" {
-  instance = module.ec2.id
-  domain   = "vpc"
-}
+# resource "aws_eip" "ec2" {
+#   instance = module.ec2.id
+#   domain   = "vpc"
+# }
 
 
-resource "null_resource" "ansible_provisioner" {
+# resource "null_resource" "ansible_provisioner" {
 
-  # Changes to any instance of the cluster requires re-provisioning
-  triggers = {
-    always_run = timestamp()
-  }
+#   # Changes to any instance of the cluster requires re-provisioning
+#   triggers = {
+#     always_run = timestamp()
+#   }
 
 
-  provisioner "local-exec" {
-    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook  -v ../ansible/install.yml -i ../ansible/aws_ec2.yml  --extra-vars ' migration_bucket=${data.aws_s3_bucket.asset_bucket.id} rds_endpoint=${module.rds.db_instance_endpoint} secrets_arn=${module.secrets_manager.secret_arn} region=${var.region} ' "
-  }
-  depends_on = [module.ec2, module.rds, module.secrets_manager]
-}
+#   provisioner "local-exec" {
+#     command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook  -v ../ansible/install.yml -i ../ansible/aws_ec2.yml  --extra-vars ' migration_bucket=${data.aws_s3_bucket.asset_bucket.id} rds_endpoint=${module.rds.db_instance_endpoint} secrets_arn=${module.secrets_manager.secret_arn} region=${var.region} ' "
+#   }
+#   depends_on = [module.ec2, module.rds, module.secrets_manager]
+# }
