@@ -2,8 +2,13 @@
 name: WEBSITE INFRA CREATION | ANSIBLE CONFIGURATION | SITE DEPLOYMENT
 run-name: "[${{ github.event_name }} - ${{ github.ref_name }}] Terraform executed by @${{ github.actor }}"
 
+# on:
+#   workflow_dispatch:
+
 on:
   workflow_dispatch:
+  push:
+    branches: dev
 
 permissions:
   id-token: write
