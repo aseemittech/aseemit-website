@@ -19,7 +19,7 @@ env:
   terraformS3Encryption: true
   terraformBucketKey: ${{ secrets.ACCOUNT_ID }}/${{ github.ref_name }}.tfstate
 
-  awsRegion: "us-east-1"
+  awsRegion: "ap-south-1"
   awsAccountNumber: ${{ secrets.ACCOUNT_ID }}
   githubToken: ${{secrets.TOKEN_GITHUB}}
 
