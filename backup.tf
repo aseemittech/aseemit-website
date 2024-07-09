@@ -7,6 +7,7 @@ module "destination_vault" {
 module "backup" {
   source     = "./modules/aws-backup"
   vault_name = local.backup.vault_name
+  region     = local.region
   backup_plans = {
     "rds" = {
       resources = [module.rds.db_instance_arn]
