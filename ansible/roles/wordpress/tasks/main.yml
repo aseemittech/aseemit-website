@@ -1,0 +1,120 @@
+---
+- name: Wordpress | Install php
+  remote_user: ssm-user
+  become: true
+  apt:
+    pkg:
+      [
+        "php-pear",
+        "php-fpm",
+        "php-dev",
+        "php-zip",
+        "php-curl",
+        "php-xmlrpc",
+        "php-gd",
+        "php-mysql",
+        "php-mbstring",
+        "php-xml",
+      ]
+    update_cache: yes
+    force_apt_get: yes
+    state: present
+
+- name: Wordpress | Install nginx
+  apt:
+    pkg: nginx
+    update_cache: yes
+    state: present
+  when: wp_webserver == "nginx"
+
+- name: Wordpress | Remove elements from /var/www/html/
+  file:
+    path: /var/www/html/index.html
+    state: absent
+  when: wp_install_dir == "/var/www/html"
+
+- name: Wordpress | Create directory
+  file:
+    path: "{{ wp_install_dir }}"
+    state: directory
+    mode: 0755
+
+- name: Download AWS CLI v2 installer
+  get_url:
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /tmp/awscliv2.zip
+    mode: "0644"
+
+- name: Unzip AWS CLI v2 installer
+  ansible.builtin.unarchive:
+    src: /tmp/awscliv2.zip
+    dest: /tmp/
+    remote_src: yes
+
+- name: Run the AWS CLI install script
+  ansible.builtin.shell: sudo ./aws/install --update
+  args:
+    chdir: /tmp/
+
+- name: Check AWS CLI version
+  command: aws --version
+  register: version
+  changed_when: false
+
+- name: Show AWS CLI version
+  debug:
+    msg: "AWS CLI version installed: {{ version.stdout }}"
+
+- include_tasks: database.yml
+
+- name: Copy WordPress archive from S3
+  command: aws s3 cp s3://{{  ansible_aws_ssm_bucket_name }}/public_html.zip /tmp/
+
+- name: Wordpress |  Creat temp location
+  ansible.builtin.file:
+    path: /tmp/wordpress
+    state: directory
+    mode: "0755"
+
+- name: Wordpress | Extract archive in temporary location
+  unarchive:
+    src: /tmp/public_html.zip
+    dest: /tmp/wordpress
+    remote_src: yes
+
+- name: Wordpress | Move files from temporary location to {{ wp_install_dir }}
+  command: cp -rf . "{{ wp_install_dir }}"
+  args:
+    chdir: /tmp/wordpress/public_html
+
+- name: Wordpress | Remove temporary files
+  file:
+    path: /tmp/public_html.zip
+    state: absent
+
+- name: Wordpress | Fetch random salts for wp-config.php
+  uri:
+    url: https://api.wordpress.org/secret-key/1.1/salt/
+    return_content: yes
+  become: False
+  register: "wp_salt_array"
+
+- name: set wp_salt fact
+  set_fact:
+    wp_salt: "{{ wp_salt_array.content }}"
+
+- name: Wordpress | Copy wp-config.php file
+  template:
+    src: wp-config.php.j2
+    dest: "{{ wp_install_dir }}/wp-config.php"
+
+- name: Wordpress | Change ownership of installation directory
+  file:
+    path: "{{ wp_install_dir }}"
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
+
+- include_tasks: nginx.yml
+  when: wp_webserver == "nginx"

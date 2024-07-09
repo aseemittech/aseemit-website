@@ -1,0 +1,20 @@
+---
+- hosts: all
+  remote_user: ssm-user
+  become: true
+  gather_facts: true
+  vars:
+    wp_webserver: nginx
+    wp_sitename: aseemittech.com
+    wp_admin_email: "admin@aseemittech.com"
+    wp_db_host: "{{ rds_endpoint }}"
+    wp_mysql_db: "aseemitt_new"
+    wp_install_dir: "/var/www/{{ wp_sitename }}"
+    ansible_connection: community.aws.aws_ssm
+    ansible_aws_ssm_region: "ap-south-1"
+    ansible_aws_ssm_timeout: 5000
+    ansible_aws_ssm_retries: 10
+    ansible_aws_ssm_bucket_name: "{{ migration_bucket }}"
+  roles:
+    - wordpress
+    - cloudwatch_agent

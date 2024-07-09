@@ -1,0 +1,54 @@
+{
+  "metrics": {
+    "aggregation_dimensions": [ [ "InstanceId" ] ],
+    "metrics_collected": {
+      "cpu": {
+        "resources": [
+          "*"
+        ],
+        "measurement": [
+          {"name": "cpu_usage_idle", "rename": "CPU_USAGE_IDLE", "unit": "Percent"},
+          {"name": "cpu_usage_nice", "unit": "Percent"},
+          "cpu_usage_guest"
+        ],
+        "totalcpu": false,
+        "metrics_collection_interval": 10
+      },
+      "mem": {
+        "measurement": [
+          "mem_used",
+          "mem_cached",
+          "mem_total"
+        ],
+        "metrics_collection_interval": 10
+      },
+      "processes": {
+        "measurement": [
+          "running",
+          "sleeping",
+          "dead"
+        ]
+      }
+    }
+  },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/amazon/ssm/amazon-ssm-agent.log",
+            "log_group_name": "ec2-log-group",
+            "log_stream_name": "{instance_id}/cloudwatch-log-agent"
+          },
+
+          {
+            "file_path": "/var/log/cloud-init-output.log" ,
+            "log_group_name": "ec2-log-group",
+            "log_stream_name": "{instance_id}/cloud-init-output"
+          }
+        ]
+      }
+    },
+    "log_stream_name": "{instance_id}/catchall"
+  }
+}

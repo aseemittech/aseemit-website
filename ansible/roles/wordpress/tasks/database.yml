@@ -1,0 +1,45 @@
+---
+- name: Install dependencies and PyMySQL
+  apt:
+    name:
+      - php-mysql
+      - python3-pymysql
+    update_cache: yes
+    state: present
+
+- name: Install MySQL client
+  become: true
+  apt:  
+    name: mysql-client
+    state: present
+
+- name: Copy database dump from S3
+  command: aws s3 cp s3://{{ ansible_aws_ssm_bucket_name }}/aseemitt_new.sql /tmp/
+
+- name: Retrieve database secrets from AWS Secrets Manager
+  command: aws secretsmanager get-secret-value --secret-id {{ secrets_arn }} --region {{ region }} --query SecretString --output text
+  register: secret_output
+
+- name: Parse database secrets
+  set_fact:
+    wp_mysql_secrets_raw: "{{ secret_output.stdout | from_json }}"  # First parse if the output is JSON string
+  ignore_errors: true
+
+- name: Set database credentials from secrets
+  set_fact:
+    wp_mysql_user: "{{ wp_mysql_secrets_raw.username }}"
+    wp_mysql_password: "{{ wp_mysql_secrets_raw.password }}"
+    wp_db_host: "{{rds_endpoint | split(':') | first}}"
+
+- name: Import database
+  community.mysql.mysql_db:
+    name: "{{ wp_mysql_db }}"
+    login_host: "{{ wp_db_host }}"
+    login_user: "{{ wp_mysql_user }}"
+    login_password: "{{ wp_mysql_password }}"
+    login_port: 3306
+    encoding: "utf8mb4"
+    state: import
+    config_file: ''
+    target: "/tmp/aseemitt_new.sql"
+  ignore_errors: true

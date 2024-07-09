@@ -1,0 +1,4 @@
+app_log_path: "/var/log/nginx"
+servers:
+  - server1
+  - server2
