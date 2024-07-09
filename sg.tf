@@ -1,5 +1,47 @@
+################################################################################
+# Security Group for EC2 Bastion
+################################################################################
+
+resource "aws_security_group" "ec2" {
+  name        = module.naming.resources.sg.name
+  description = "Allow traffic to and from ec2"
+  vpc_id      = module.vpc.vpc_id
+
+  # HTTP rule
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # ssh to ec2 instance
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc.vpc_cidr_block]
+  }
+
+  # HTTPS rule
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Outbound rule to allow all traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 #################################################
-# Resources defination for sg
+# Resources defination for db sg
 #################################################
 resource "aws_security_group" "database" {
   description = "Security group for database"
@@ -19,78 +61,21 @@ resource "aws_security_group" "database" {
     protocol    = "-1"
     cidr_blocks = [module.vpc.vpc_cidr_block]
   }
+  tags = local.tags
 }
-### Backend application security group
-resource "aws_security_group" "backend" {
-  name_prefix = local.vpc.security_group_backend
-  description = "Security group for backend"
+
+### VPC TLS
+resource "aws_security_group" "vpc_tls" {
+  name_prefix = "vpc_tls"
+  description = "Allow TLS inbound traffic"
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description     = "Input from frontend security group to backend"
-    from_port       = 1880
-    to_port         = 1880
-    protocol        = "tcp"
-    security_groups = [aws_security_group.frontend.id]
-    cidr_blocks     = [module.vpc.vpc_cidr_block]
+    description = "TLS from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc.vpc_cidr_block]
   }
 
-  ingress {
-    description     = "SSH ingress"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [module.alb.security_group_id]
-  }
-  ingress {
-    description     = "HTTP ingress"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [module.alb.security_group_id]
-  }
-  ingress {
-    description     = "http ingress"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [module.alb.security_group_id]
-  }
-
-  egress {
-    description = "output tcp to public"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-### Frontend application security group
-
-resource "aws_security_group" "frontend" {
-  name_prefix = local.vpc.security_group_frontend
-  description = "Security group for frontend"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    description     = "http ingress"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [module.alb.security_group_id]
-  }
-  ingress {
-    description     = "https ingress"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [module.alb.security_group_id]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }

@@ -1,0 +1,72 @@
+---
+- name: Check if aws cli profile exist
+  block:
+    - name: Check if {{ cwa_agent_profile_credentials_file }} exist
+      stat:
+        path: "{{ cwa_agent_profile_credentials_file }}"
+      register: profile_credentials_file
+
+      # failed_when: not profile_credentials_file.stat.exists
+    - name: Fails when AWS CLI profiles configuration doesn't exist
+      debug:
+        msg: >
+          The variable 'cwa_agent_mode: 'onPremise'' is set or 'cwa_use_credentials is true' and you don't have configure
+          the aws profile correctly, please check the value of
+          'cwa_profile' and 'cwa_agent_profile_path'
+      failed_when: not profile_credentials_file.stat.exists
+      when: not profile_credentials_file.stat.exists
+
+    - name: Check if profile name {{ cwa_profile }} exist into {{ cwa_agent_profile_credentials_file }} file
+      lineinfile:
+        path: "{{ cwa_agent_profile_credentials_file }}"
+        line: "[{{ cwa_profile }}]"
+      check_mode: true
+      register: presence
+      # failed_when: presence.changed
+      when: profile_credentials_file.stat.exists is defined and profile_credentials_file.stat.exists
+
+    - name: Fails when AWS CLI profile {{ cwa_profile }} doesn't exist into file {{ cwa_agent_profile_credentials_file }}
+      debug:
+        msg:
+          - "The profile name {{ cwa_profile }} doesn't exist into {{ cwa_agent_profile_credentials_file }}"
+          - "Line [{{ cwa_profile }}] is not present in file {{ cwa_agent_profile_credentials_file }}"
+      failed_when: presence.changed
+      when: profile_credentials_file.stat.exists is defined and profile_credentials_file.stat.exists and presence.changed
+
+  ignore_errors: "{{ ansible_check_mode }}"
+  when: cwa_need_credentials
+
+- name: Deploy {{ cwa_package }} common configuration file
+  template:
+    src: agent/common-config.toml.j2
+    dest: "{{ cwa_common_config_file }}"
+    mode: 0644
+    force: true
+  notify: Reload {{ cwa_package }}
+
+- name: Deploy {{ cwa_package }} logrotate configuration file
+  template:
+    src: logrotate/aws-cwa.j2
+    dest: "{{ cwa_logrotate_config_file }}"
+    mode: 0644
+    force: true
+  notify: Reload {{ cwa_logrotate_daemon }}
+
+# Use configuration file from template
+- name: Deploy {{ cwa_package }} agent configuration file from default template
+  template:
+    src: agent/amazon-cloudwatch-agent.json.j2
+    dest: "{{ cwa_agent_config_file }}"
+    mode: 0644
+    force: true
+  notify: Reload {{ cwa_package }}
+  when: cwa_use_conf_json_template
+
+# Use custom file from file content
+- name: Deploy {{ cwa_package }} agent custom configuration file from file content
+  copy:
+    content: "{{ cwa_conf_json_file_content | to_nice_json }}"
+    dest: "{{ cwa_agent_config_file }}"
+    mode: 0644
+  notify: Reload {{ cwa_package }}
+  when: not cwa_use_conf_json_template

@@ -1,0 +1,61 @@
+---
+# references
+# https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Agent-on-first-instance.html
+# https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/verify-CloudWatch-Agent-Package-Signature.html
+
+# debug
+- name: check ansible_os_family
+  debug: msg="ansible_os_family = {{ ansible_os_family }}"
+  when: cwa_debug
+
+- name: check ansible_distribution
+  debug: msg="ansible_distribution = {{ ansible_distribution }}"
+  when: cwa_debug
+
+- name: check ansible_distribution_major_version
+  debug: msg="ansible_distribution_major_version = {{ ansible_distribution_major_version }}"
+  when: cwa_debug
+
+- name: check ansible_distribution_release
+  debug: msg="ansible_distribution_release = {{ ansible_distribution_release }}"
+  when: cwa_debug
+
+- name: check ansible_virtualization_type
+  debug: msg="ansible_virtualization_type = {{ ansible_virtualization_type }}"
+  when: cwa_debug
+
+- name: Set architecture name
+  set_fact:
+    cwa_arch_name: "{{ cwa_arch_names.get(ansible_architecture) }}"
+
+# Include of vars
+- name: Include variables for {{ ansible_distribution | lower }}
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution | lower }}.yml"
+    - "main.yml"
+  when: >
+    ansible_os_family == 'RedHat' or ansible_os_family == 'Debian'
+  tags:
+    - include-vars
+
+# Installation tasks
+- name: Include tasks for installation on {{ ansible_os_family | lower }} distribution
+  include_tasks: "install-{{ ansible_os_family | lower }}.yml"
+  when: >
+    ansible_os_family == 'RedHat' or ansible_os_family == 'Debian'
+  tags:
+    - include-install-task
+
+# Configuration tasks
+- name: Configure {{ cwa_package }} for {{ ansible_distribution | lower }}
+  include_tasks: "configure.yml"
+  tags:
+    - configure
+
+- name: Start the Amazon CloudWatch Agent
+  systemd:
+    name: amazon-cloudwatch-agent
+    state: started
+    enabled: yes

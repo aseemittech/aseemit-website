@@ -1,0 +1,15 @@
+---
+cwa_package_url: https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/{{ cwa_arch_name }}/latest/amazon-cloudwatch-agent.deb
+cwa_package_signature: https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/{{ cwa_arch_name }}/latest/amazon-cloudwatch-agent.deb.sig
+
+cwa_gpg_dependencies_packages:
+  - gpg
+
+cwa_agent_mode: "ec2"
+cwa_profile: "AmazonCloudWatchAgent"
+cwa_aws_region: "ap-south-1"
+cwa_conf_json_file_content: "{{ lookup('file', 'files/config.json') | from_json }}"
+cwa_arch_names: {
+  "x86_64": "amd64",
+  "aarch64": "arm64"
+}

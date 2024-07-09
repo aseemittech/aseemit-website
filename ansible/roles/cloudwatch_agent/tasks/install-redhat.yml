@@ -1,0 +1,141 @@
+---
+- name: Add {{ cwa_package }} key
+  rpm_key:
+    state: present
+    key: "{{ cwa_package_gpg }}"
+  tags:
+    - molecule-idempotence-notest
+    - add-key
+    - download
+    - install
+
+- name: Download {{ cwa_package }}.rpm.sig file
+  get_url:
+    url: "{{ cwa_package_signature }}"
+    dest: "{{ cwa_temp_path }}/{{ cwa_package }}.rpm.sig"
+    timeout: "{{ cwa_global_downloads_timeout }}"
+  tags:
+    - download-signature
+    - verify-signature
+    - download
+    - install
+
+- name: Download {{ cwa_package }}.rpm file
+  get_url:
+    url: "{{ cwa_package_url }}"
+    dest: "{{ cwa_temp_path }}/{{ cwa_package }}.rpm"
+    timeout: "{{ cwa_global_downloads_timeout }}"
+  tags:
+    - download
+    - verify-signature
+    - install
+
+- name: Verify {{ cwa_package }} package signature
+  command: gpg --verify {{ cwa_package }}.rpm.sig {{ cwa_package }}.rpm
+  register: verified_sig
+  failed_when: "'BAD' in verified_sig.stderr"
+  changed_when: false
+  args:
+    chdir: "{{ cwa_temp_path }}"
+  tags:
+    - verify-signature
+    - install
+
+- name: Install {{ cwa_package }} dependencies (it depend on EPEL Repositories, you ned to take care of that)
+  block:
+    - name: Install {{ cwa_dependencies_packages }} dependency on Amazon 1/2
+      yum:
+        name: "{{ cwa_dependencies_packages }}"
+        state: present
+      register: package_ok
+      retries: "{{ cwa_global_downloads_retries }}"
+      delay: "{{ cwa_global_downloads_delay }}"
+      until: package_ok is success
+      when: >
+        ansible_os_family == 'RedHat' and
+        ansible_distribution == 'Amazon'
+      tags:
+        - install
+
+    - name: Install {{ cwa_dependencies_packages }} dependency on {{ ansible_distribution }} 6/7/8/9
+      yum:
+        name: "{{ cwa_dependencies_packages }}"
+        state: present
+      register: package_ok
+      retries: "{{ cwa_global_downloads_retries }}"
+      delay: "{{ cwa_global_downloads_delay }}"
+      until: package_ok is success
+      when: >
+        ansible_os_family == 'RedHat' and (
+          ansible_distribution == 'CentOS' or
+          ansible_distribution == 'RedHat' or
+          ansible_distribution == 'Rocky'
+        ) and (
+          ansible_distribution_major_version == '9' or
+          ansible_distribution_major_version == '8' or
+          ansible_distribution_major_version == '7' or
+          ansible_distribution_major_version == '6'
+        )
+      tags:
+        - install
+  when: "'collectd' in cwa_conf_json_file_content"
+
+- name: Install {{ cwa_package }}.rpm on Amazon 1/2
+  yum:
+    name: "{{ cwa_temp_path }}/{{ cwa_package }}.rpm"
+    disable_gpg_check: true
+    state: present
+  register: package_ok
+  retries: "{{ cwa_global_downloads_retries }}"
+  delay: "{{ cwa_global_downloads_delay }}"
+  until: package_ok is success
+  when: >
+    ansible_os_family == 'RedHat' and
+    ansible_distribution == 'Amazon'
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - install
+
+- name: Install {{ cwa_package }}.rpm on {{ ansible_distribution }} 6/7
+  yum:
+    name: "{{ cwa_temp_path }}/{{ cwa_package }}.rpm"
+    disable_gpg_check: true
+    state: present
+  register: package_ok
+  retries: "{{ cwa_global_downloads_retries }}"
+  delay: "{{ cwa_global_downloads_delay }}"
+  until: package_ok is success
+  when: >
+    ansible_os_family == 'RedHat' and (
+      ansible_distribution == 'CentOS' or
+      ansible_distribution == 'RedHat' or
+      ansible_distribution == 'Rocky'
+    ) and (
+      ansible_distribution_major_version == '7' or
+      ansible_distribution_major_version == '6'
+    )
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - install
+
+- name: Install {{ cwa_package }}.rpm on {{ ansible_distribution }} 8/9
+  dnf:
+    name: "{{ cwa_temp_path }}/{{ cwa_package }}.rpm"
+    disable_gpg_check: true
+    state: present
+  register: package_ok
+  retries: "{{ cwa_global_downloads_retries }}"
+  delay: "{{ cwa_global_downloads_delay }}"
+  until: package_ok is success
+  when: >
+    ansible_os_family == 'RedHat' and (
+      ansible_distribution == 'CentOS' or
+      ansible_distribution == 'RedHat' or
+      ansible_distribution == 'Rocky'
+    ) and (
+      ansible_distribution_major_version == '9' or
+      ansible_distribution_major_version == '8'
+    )
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - install

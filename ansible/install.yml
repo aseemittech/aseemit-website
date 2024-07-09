@@ -11,9 +11,10 @@
     wp_mysql_db: "aseemitt_new"
     wp_install_dir: "/var/www/{{ wp_sitename }}"
     ansible_connection: community.aws.aws_ssm
-    ansible_aws_ssm_region: "us-east-1"
+    ansible_aws_ssm_region: "ap-south-1"
     ansible_aws_ssm_timeout: 5000
     ansible_aws_ssm_retries: 10
     ansible_aws_ssm_bucket_name: "{{ migration_bucket }}"
   roles:
     - wordpress
+    - cloudwatch_agent
