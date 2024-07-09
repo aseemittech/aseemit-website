@@ -13,8 +13,8 @@ permissions:
 env:
   terraformVersion: 1.3.6
   terraformWorkDir: ./
-  terraformBucket: aseemit-site-tf-state
-  terraformDynamo: aseemit-site-tf-state
+  terraformBucket: aseemit-tf-states
+  terraformDynamo: aseemit-tf-states
   terraformS3Acl: bucket-owner-full-control
   terraformS3Encryption: true
   terraformBucketKey: ${{ secrets.ACCOUNT_ID }}/${{ github.ref_name }}.tfstate
