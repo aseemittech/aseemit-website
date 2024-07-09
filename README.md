@@ -57,6 +57,8 @@ Wbsite codebase for aseemit
 | [null_resource.ansible_provisioner](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_string.rand4](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 | [aws_s3_bucket.asset_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/s3_bucket) | data source |
 | [aws_secretsmanager_secret.secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret) | data source |
 
@@ -86,7 +88,7 @@ Wbsite codebase for aseemit
 | <a name="input_naming_environment"></a> [naming\_environment](#input\_naming\_environment) | Name of the environment | `string` | `"production"` | no |
 | <a name="input_number_of_azs"></a> [number\_of\_azs](#input\_number\_of\_azs) | number of availability zones | `number` | `3` | no |
 | <a name="input_recovery_window_in_days"></a> [recovery\_window\_in\_days](#input\_recovery\_window\_in\_days) | Number of days that AWS Secrets Manager waits before it can delete the secret. This value can be `0` to force deletion without recovery or range from `7` to `30` days. The default value is `30` | `number` | `null` | no |
-| <a name="input_region"></a> [region](#input\_region) | AWS region | `string` | `"us-east-1"` | no |
+| <a name="input_region"></a> [region](#input\_region) | AWS region | `string` | `"ap-south-1"` | no |
 | <a name="input_root_throughput"></a> [root\_throughput](#input\_root\_throughput) | throughput for the root volume | `string` | n/a | yes |
 | <a name="input_root_volume_size"></a> [root\_volume\_size](#input\_root\_volume\_size) | root volume size | `string` | n/a | yes |
 | <a name="input_root_volume_type"></a> [root\_volume\_type](#input\_root\_volume\_type) | root volume type | `string` | n/a | yes |
