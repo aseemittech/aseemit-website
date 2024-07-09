@@ -52,3 +52,8 @@ subscriptions = {
     endpoint = "rajendra.dongol@aseemittech.com"
   }
 }
+
+### AWS Backup Vault
+rule_schedule          = "cron(0 * * * ? *)"
+rule_start_window      = "60"
+rule_completion_window = "120"

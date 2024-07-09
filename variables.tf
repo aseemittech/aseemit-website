@@ -194,3 +194,19 @@ variable "subscriptions" {
   description = "List of maps containing subscriptions"
   type        = any
 }
+
+#####################################################
+##  AWS Backup                                      #
+#####################################################
+variable "rule_schedule" {
+  description = "A CRON expression specifying when AWS Backup initiates a backup job"
+  type        = string
+}
+variable "rule_start_window" {
+  description = "The amount of time in minutes before beginning a backup"
+  type        = string
+}
+variable "rule_completion_window" {
+  description = "The amount of time AWS Backup attempts a backup before canceling the job and returning an error"
+  type        = string
+}

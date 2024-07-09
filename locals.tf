@@ -125,4 +125,11 @@ locals {
   route53 = {
     hosted_zone_name = "aseemittech.com"
   }
+
+  backup = {
+    vault_name             = "${var.environment}-back-vault"
+    plan_name              = "${var.environment}-backup-plan"
+    rule_name              = "${var.environment}-backup-rule"
+    destination_vault_name = "${var.environment}-destination-backup-vault"
+  }
 }

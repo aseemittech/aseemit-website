@@ -21,8 +21,10 @@ Wbsite codebase for aseemit
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_backup"></a> [backup](#module\_backup) | ./modules/aws-backup | n/a |
 | <a name="module_cpu-alarm"></a> [cpu-alarm](#module\_cpu-alarm) | ./modules/alarm | n/a |
 | <a name="module_dashboard"></a> [dashboard](#module\_dashboard) | ./modules/dashboard | n/a |
+| <a name="module_destination_vault"></a> [destination\_vault](#module\_destination\_vault) | ./modules/aws-backup | n/a |
 | <a name="module_ec2"></a> [ec2](#module\_ec2) | terraform-aws-modules/ec2-instance/aws | 5.6.1 |
 | <a name="module_log_widgets"></a> [log\_widgets](#module\_log\_widgets) | ./modules/dashboard/formater/logs | n/a |
 | <a name="module_metric_widgets"></a> [metric\_widgets](#module\_metric\_widgets) | ./modules/dashboard/formater/metrics | n/a |
@@ -38,6 +40,7 @@ Wbsite codebase for aseemit
 
 | Name | Type |
 |------|------|
+| [aws_backup_vault_notifications.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/backup_vault_notifications) | resource |
 | [aws_eip.ec2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_iam_instance_profile.instance_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_policy.s3_read_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
@@ -87,6 +90,9 @@ Wbsite codebase for aseemit
 | <a name="input_root_throughput"></a> [root\_throughput](#input\_root\_throughput) | throughput for the root volume | `string` | n/a | yes |
 | <a name="input_root_volume_size"></a> [root\_volume\_size](#input\_root\_volume\_size) | root volume size | `string` | n/a | yes |
 | <a name="input_root_volume_type"></a> [root\_volume\_type](#input\_root\_volume\_type) | root volume type | `string` | n/a | yes |
+| <a name="input_rule_completion_window"></a> [rule\_completion\_window](#input\_rule\_completion\_window) | The amount of time AWS Backup attempts a backup before canceling the job and returning an error | `string` | n/a | yes |
+| <a name="input_rule_schedule"></a> [rule\_schedule](#input\_rule\_schedule) | A CRON expression specifying when AWS Backup initiates a backup job | `string` | n/a | yes |
+| <a name="input_rule_start_window"></a> [rule\_start\_window](#input\_rule\_start\_window) | The amount of time in minutes before beginning a backup | `string` | n/a | yes |
 | <a name="input_subscriptions"></a> [subscriptions](#input\_subscriptions) | List of maps containing subscriptions | `any` | n/a | yes |
 | <a name="input_tf_namespace"></a> [tf\_namespace](#input\_tf\_namespace) | Namespace, which could be your organization name or abbreviation, e.g. 'eg' or 'cp' | `string` | `"aseemit"` | no |
 | <a name="input_use_name_prefix"></a> [use\_name\_prefix](#input\_use\_name\_prefix) | Determines whether to use name prefix or not | `bool` | n/a | yes |
