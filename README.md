@@ -21,14 +21,16 @@ Wbsite codebase for aseemit
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_asset_bucket"></a> [asset\_bucket](#module\_asset\_bucket) | ./modules/s3 | n/a |
+| <a name="module_backup"></a> [backup](#module\_backup) | ./modules/aws-backup | n/a |
 | <a name="module_cpu-alarm"></a> [cpu-alarm](#module\_cpu-alarm) | ./modules/alarm | n/a |
 | <a name="module_dashboard"></a> [dashboard](#module\_dashboard) | ./modules/dashboard | n/a |
+| <a name="module_destination_vault"></a> [destination\_vault](#module\_destination\_vault) | ./modules/aws-backup | n/a |
 | <a name="module_ec2"></a> [ec2](#module\_ec2) | terraform-aws-modules/ec2-instance/aws | 5.6.1 |
 | <a name="module_log_widgets"></a> [log\_widgets](#module\_log\_widgets) | ./modules/dashboard/formater/logs | n/a |
 | <a name="module_metric_widgets"></a> [metric\_widgets](#module\_metric\_widgets) | ./modules/dashboard/formater/metrics | n/a |
 | <a name="module_naming"></a> [naming](#module\_naming) | ./modules/naming | n/a |
 | <a name="module_rds"></a> [rds](#module\_rds) | ./modules/rds | n/a |
+| <a name="module_route53_hosted_zone"></a> [route53\_hosted\_zone](#module\_route53\_hosted\_zone) | ./modules/zones | n/a |
 | <a name="module_secrets_manager"></a> [secrets\_manager](#module\_secrets\_manager) | ./modules/secrets | n/a |
 | <a name="module_sns"></a> [sns](#module\_sns) | ./modules/sns | n/a |
 | <a name="module_status-check-alarm"></a> [status-check-alarm](#module\_status-check-alarm) | ./modules/alarm | n/a |
@@ -38,6 +40,7 @@ Wbsite codebase for aseemit
 
 | Name | Type |
 |------|------|
+| [aws_backup_vault_notifications.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/backup_vault_notifications) | resource |
 | [aws_eip.ec2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_iam_instance_profile.instance_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_policy.s3_read_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
@@ -54,7 +57,6 @@ Wbsite codebase for aseemit
 | [null_resource.ansible_provisioner](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_string.rand4](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
-| [aws_iam_policy_document.bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_s3_bucket.asset_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/s3_bucket) | data source |
 | [aws_secretsmanager_secret.secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret) | data source |
 
@@ -65,9 +67,6 @@ Wbsite codebase for aseemit
 | <a name="input_allocated_storage"></a> [allocated\_storage](#input\_allocated\_storage) | The allocated storage in gigabytes | `string` | `null` | no |
 | <a name="input_associate_public_ip_address"></a> [associate\_public\_ip\_address](#input\_associate\_public\_ip\_address) | public ip allocation | `bool` | n/a | yes |
 | <a name="input_backup_retention_period"></a> [backup\_retention\_period](#input\_backup\_retention\_period) | The days to retain backups for | `number` | `0` | no |
-| <a name="input_block_public_acls"></a> [block\_public\_acls](#input\_block\_public\_acls) | ################################# ##         s3           ## ################################# | `bool` | `true` | no |
-| <a name="input_block_public_policy"></a> [block\_public\_policy](#input\_block\_public\_policy) | n/a | `bool` | `true` | no |
-| <a name="input_control_object_ownership"></a> [control\_object\_ownership](#input\_control\_object\_ownership) | n/a | `bool` | `false` | no |
 | <a name="input_create_iam_instance_profile"></a> [create\_iam\_instance\_profile](#input\_create\_iam\_instance\_profile) | instance profile creation | `bool` | n/a | yes |
 | <a name="input_create_monitoring_role"></a> [create\_monitoring\_role](#input\_create\_monitoring\_role) | Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs | `bool` | `false` | no |
 | <a name="input_create_random_password"></a> [create\_random\_password](#input\_create\_random\_password) | Whether to create random password for RDS primary cluster | `bool` | `true` | no |
@@ -91,13 +90,15 @@ Wbsite codebase for aseemit
 | <a name="input_root_throughput"></a> [root\_throughput](#input\_root\_throughput) | throughput for the root volume | `string` | n/a | yes |
 | <a name="input_root_volume_size"></a> [root\_volume\_size](#input\_root\_volume\_size) | root volume size | `string` | n/a | yes |
 | <a name="input_root_volume_type"></a> [root\_volume\_type](#input\_root\_volume\_type) | root volume type | `string` | n/a | yes |
+| <a name="input_rule_completion_window"></a> [rule\_completion\_window](#input\_rule\_completion\_window) | The amount of time AWS Backup attempts a backup before canceling the job and returning an error | `string` | n/a | yes |
+| <a name="input_rule_schedule"></a> [rule\_schedule](#input\_rule\_schedule) | A CRON expression specifying when AWS Backup initiates a backup job | `string` | n/a | yes |
+| <a name="input_rule_start_window"></a> [rule\_start\_window](#input\_rule\_start\_window) | The amount of time in minutes before beginning a backup | `string` | n/a | yes |
 | <a name="input_subscriptions"></a> [subscriptions](#input\_subscriptions) | List of maps containing subscriptions | `any` | n/a | yes |
 | <a name="input_tf_namespace"></a> [tf\_namespace](#input\_tf\_namespace) | Namespace, which could be your organization name or abbreviation, e.g. 'eg' or 'cp' | `string` | `"aseemit"` | no |
 | <a name="input_use_name_prefix"></a> [use\_name\_prefix](#input\_use\_name\_prefix) | Determines whether to use name prefix or not | `bool` | n/a | yes |
 | <a name="input_user_data"></a> [user\_data](#input\_user\_data) | user data definition | `string` | n/a | yes |
 | <a name="input_user_data_replace_on_change"></a> [user\_data\_replace\_on\_change](#input\_user\_data\_replace\_on\_change) | condition of the instance that is being used | `bool` | n/a | yes |
 | <a name="input_username"></a> [username](#input\_username) | Username for the master DB user | `string` | `null` | no |
-| <a name="input_versioning_enabled"></a> [versioning\_enabled](#input\_versioning\_enabled) | n/a | `bool` | `true` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | Range of VPC cidr | `string` | n/a | yes |
 
 ## Outputs
