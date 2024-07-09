@@ -99,8 +99,6 @@ locals {
     alarm_actions       = ["${module.sns.aws_sns_topic_arn}"]
   }
 
-
-
   log_widgets = {
     region = "ap-south-1"
     x_axis = 6
@@ -122,5 +120,9 @@ locals {
     performance  = "Performance"
     recovery     = "Recovery"
     security     = "Security"
+  }
+
+  route53 = {
+    hosted_zone_name = "aseemittech.com"
   }
 }

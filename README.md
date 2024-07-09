@@ -28,6 +28,7 @@ Wbsite codebase for aseemit
 | <a name="module_metric_widgets"></a> [metric\_widgets](#module\_metric\_widgets) | ./modules/dashboard/formater/metrics | n/a |
 | <a name="module_naming"></a> [naming](#module\_naming) | ./modules/naming | n/a |
 | <a name="module_rds"></a> [rds](#module\_rds) | ./modules/rds | n/a |
+| <a name="module_route53_hosted_zone"></a> [route53\_hosted\_zone](#module\_route53\_hosted\_zone) | ./modules/zones | n/a |
 | <a name="module_secrets_manager"></a> [secrets\_manager](#module\_secrets\_manager) | ./modules/secrets | n/a |
 | <a name="module_sns"></a> [sns](#module\_sns) | ./modules/sns | n/a |
 | <a name="module_status-check-alarm"></a> [status-check-alarm](#module\_status-check-alarm) | ./modules/alarm | n/a |
