@@ -1,6 +1,6 @@
 module "destination_vault" {
   source     = "./modules/aws-backup"
-  region     = "us-east-2"
+  region     = "us-east-1"
   vault_name = local.backup.destination_vault_name
 }
 
