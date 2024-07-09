@@ -7,6 +7,7 @@ module "destination_vault" {
 module "backup" {
   source     = "./modules/aws-backup"
   vault_name = local.backup.vault_name
+  region     = "ap-south-1"
   backup_plans = {
     "rds" = {
       resources = [module.rds.db_instance_arn]
@@ -31,8 +32,8 @@ module "backup" {
 
 }
 
-resource "aws_backup_vault_notifications" "this" {
-  backup_vault_name   = module.backup.backup_vault_id
-  sns_topic_arn       = module.sns.aws_sns_topic_arn
-  backup_vault_events = ["BACKUP_JOB_STARTED", "RESTORE_JOB_COMPLETED", "BACKUP_JOB_FAILED", "BACKUP_JOB_COMPLETED"]
-}
+# resource "aws_backup_vault_notifications" "this" {
+#   backup_vault_name   = module.backup.backup_vault_id
+#   sns_topic_arn       = module.sns.aws_sns_topic_arn
+#   backup_vault_events = ["BACKUP_JOB_STARTED", "RESTORE_JOB_COMPLETED", "BACKUP_JOB_FAILED", "BACKUP_JOB_COMPLETED"]
+# }
