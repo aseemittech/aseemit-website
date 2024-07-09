@@ -29,26 +29,6 @@ variable "environment" {
   default = "prod"
 }
 
-##################################
-###         s3           ##
-##################################
-variable "block_public_acls" {
-  type    = bool
-  default = true
-}
-variable "block_public_policy" {
-  type    = bool
-  default = true
-}
-variable "versioning_enabled" {
-  type    = bool
-  default = true
-}
-variable "control_object_ownership" {
-  type    = bool
-  default = false
-}
-
 #################################################################################
 # variables for VPC
 #################################################################################
