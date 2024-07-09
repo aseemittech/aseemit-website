@@ -3,9 +3,6 @@ output "region" {
   value       = var.region
 }
 
-output "asset_bucket" {
-  value = module.asset_bucket.s3_bucket_id
-}
 
 ################## RDS ####################
 output "db_instance_name" {

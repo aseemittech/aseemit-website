@@ -105,7 +105,6 @@ Wbsite codebase for aseemit
 
 | Name | Description |
 |------|-------------|
-| <a name="output_asset_bucket"></a> [asset\_bucket](#output\_asset\_bucket) | n/a |
 | <a name="output_db_instance_arn"></a> [db\_instance\_arn](#output\_db\_instance\_arn) | The ARN of the RDS instance |
 | <a name="output_db_instance_cloudwatch_log_groups"></a> [db\_instance\_cloudwatch\_log\_groups](#output\_db\_instance\_cloudwatch\_log\_groups) | Map of CloudWatch log groups created and their attributes |
 | <a name="output_db_instance_endpoint"></a> [db\_instance\_endpoint](#output\_db\_instance\_endpoint) | The connection endpoint |

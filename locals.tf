@@ -10,6 +10,10 @@ locals {
     Region = var.region
   }
 
+  asset_bucket = {
+    bucket_name = module.naming.resources.s3.name
+  }
+
   rds = {
     identifier                          = module.naming.resources.rds.name
     parameter_group_name                = "${module.naming.resources.prefix.name}-pg"
