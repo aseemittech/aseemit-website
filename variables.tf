@@ -17,7 +17,9 @@ variable "naming_environment" {
   default     = "production"
 }
 
-### tfstate
+#################################################################################
+# variables for tfstate
+#################################################################################
 variable "tf_namespace" {
   type        = string
   default     = "aseemit"
