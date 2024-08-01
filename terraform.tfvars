@@ -10,7 +10,7 @@ number_of_azs = 2
 
 ## Variable for RDS
 db_name                 = "aseemit"
-instance_class          = "db.m5.xlarge"
+instance_class          = "db.t2.medium"
 username                = "aseem"
 monitoring_interval     = "10"
 major_engine_version    = "8.0"
@@ -23,7 +23,7 @@ create_monitoring_role  = true
 
 ## variables for ec2
 ec2_ami       = "ami-0c2af51e265bd5e0e"
-instance_type = "t3.xlarge"
+instance_type = "t3.medium"
 
 hibernation                 = true
 associate_public_ip_address = true
