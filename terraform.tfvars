@@ -17,7 +17,7 @@ major_engine_version    = "8.0"
 allocated_storage       = 20
 backup_retention_period = 1
 multi_az                = false
-deletion_protection     = true
+deletion_protection     = false
 create_random_password  = true
 create_monitoring_role  = true
 
@@ -27,7 +27,7 @@ instance_type = "t3.xlarge"
 
 hibernation                 = true
 associate_public_ip_address = true
-disable_api_stop            = true
+disable_api_stop            = false
 create_iam_instance_profile = true
 monitoring                  = true
 user_data_replace_on_change = false
